@@ -30,6 +30,7 @@ def read_file(blobpath: str) -> bytes:
         with blobfile.BlobFile(blobpath, "rb") as f:
             return f.read()
     # avoiding blobfile for public files helps avoid auth issues, like MFA prompts
+    print('Tiktoken Proxy:', TIKTOKEN_PROXIES)
     resp = requests.get(blobpath, proxies=TIKTOKEN_PROXIES)
     resp.raise_for_status()
     return resp.content
