@@ -9,6 +9,15 @@ import uuid
 
 import requests
 
+import os
+
+TIKTOKEN_PROXIES = None
+
+if os.environ.get('TIKTOKEN_HTTP_PROXY'):
+    TIKTOKEN_PROXIES = {
+        'http': os.environ['TIKTOKEN_HTTP_PROXY'],
+        'https': os.environ['TIKTOKEN_HTTP_PROXY'],
+    }
 
 def read_file(blobpath: str) -> bytes:
     if not blobpath.startswith("http://") and not blobpath.startswith("https://"):
@@ -21,7 +30,7 @@ def read_file(blobpath: str) -> bytes:
         with blobfile.BlobFile(blobpath, "rb") as f:
             return f.read()
     # avoiding blobfile for public files helps avoid auth issues, like MFA prompts
-    resp = requests.get(blobpath)
+    resp = requests.get(blobpath, proxies=TIKTOKEN_PROXIES)
     resp.raise_for_status()
     return resp.content
 
